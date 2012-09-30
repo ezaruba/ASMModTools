@@ -52,9 +52,12 @@ public class AddGetterAdapter extends ClassVisitor implements Opcodes {
         if(isFieldPresent && !isMethodPresent){
             MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, getterName, "()"+fieldDescriptor, signature, null);
             mv.visitCode();
+            
+            //Instructions are NOT GENERIC.
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, targetClazz, fieldName, fieldDescriptor);
             mv.visitInsn(ARETURN);
+            
             mv.visitEnd();
             if(mv != null){
                 mv.visitEnd();
