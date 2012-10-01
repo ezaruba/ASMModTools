@@ -14,7 +14,7 @@ public class MainTransform extends AbstractClassTransform {
 
     @Override
     public void runTransform() {
-        setup("EpicProgram.jar", "TheProgram.class");
+        setup("EpicProgram.jar", "DummyClass.class");
         start();
         addGetter("theSecretString", Type.getType(String.class).getDescriptor(), "com/dna/asm/Accessor", "getSecretString", ALOAD, ARETURN);
         changeSuperClass("com/dna/asm/accessors/SuperClass");
