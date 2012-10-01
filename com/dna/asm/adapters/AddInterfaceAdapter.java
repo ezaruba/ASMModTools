@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * @author trDna
  */
+
 public class AddInterfaceAdapter extends ClassVisitor implements Opcodes {
 
     private String[] interfacesToAdd;

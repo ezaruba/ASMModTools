@@ -1,14 +1,11 @@
 package com.dna.asm.adapters;
 
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 /**
- * Adds a getter to a given class.
  * @author trDna
  */
+
 public class AddGetterAdapter extends ClassVisitor implements Opcodes {
 
     private String fieldName = null;
@@ -19,13 +16,16 @@ public class AddGetterAdapter extends ClassVisitor implements Opcodes {
 
     private boolean isFieldPresent = false, isInterface = false, isMethodPresent = false;
 
+    private int varInsn, retInsn;
 
-    public AddGetterAdapter(final ClassVisitor cv, final String fieldName, final String fieldDescriptor, final String getterName, final String targetClazz) {
+    public AddGetterAdapter(final ClassVisitor cv, final String fieldName, final String fieldDescriptor, final String getterName, final String targetClazz, final int varInsn, final int retInsn) {
         super(ASM4, cv);
         this.fieldName = fieldName;
         this.getterName = getterName;
         this.fieldDescriptor = fieldDescriptor;
         this.targetClazz = targetClazz;
+        this.varInsn = varInsn;
+        this.retInsn = retInsn;
     }
 
     @Override
@@ -52,12 +52,9 @@ public class AddGetterAdapter extends ClassVisitor implements Opcodes {
         if(isFieldPresent && !isMethodPresent){
             MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, getterName, "()"+fieldDescriptor, signature, null);
             mv.visitCode();
-            
-            //Instructions are NOT GENERIC.
-            mv.visitVarInsn(ALOAD, 0);
+            mv.visitVarInsn(varInsn, 0);
             mv.visitFieldInsn(GETFIELD, targetClazz, fieldName, fieldDescriptor);
-            mv.visitInsn(ARETURN);
-            
+            mv.visitInsn(retInsn);
             mv.visitEnd();
             if(mv != null){
                 mv.visitEnd();

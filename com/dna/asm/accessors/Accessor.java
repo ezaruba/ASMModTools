@@ -1,4 +1,4 @@
-package com.dna.asm.generic;
+package com.dna.asm.accessors;
 
 /**
  * Created with IntelliJ IDEA.

@@ -2,7 +2,9 @@ package com.dna.asm.generic;
 
 import com.dna.asm.adapters.AddGetterAdapter;
 import com.dna.asm.adapters.AddInterfaceAdapter;
+import com.dna.asm.adapters.ChangeSuperClassAdapter;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
@@ -10,6 +12,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -25,8 +28,16 @@ public abstract class AbstractClassTransform implements Opcodes{
 
     private static JarFile jf;
     private static JarEntry entry;
-    private static ClassReader cr;
-    private static ClassWriter cw;
+    private static ClassReader cr = null;
+    private ClassWriter cw = null;
+
+    private ClassVisitor changer = null;  // ChangeSuperAdapter
+    private ClassVisitor interfaceAdder = null; // AddInterfaceAdapter
+    private ClassVisitor adder = null; // AddGetterAdapter
+
+    private ClassVisitor combinedAdapter = null; //Mixture of all adapters
+
+    private LinkedList <ClassVisitor> adapterList = new LinkedList<ClassVisitor>();
 
     public abstract void runTransform();
 
@@ -35,50 +46,64 @@ public abstract class AbstractClassTransform implements Opcodes{
         this.clazz = clazz;
     }
 
-    public void addGetter(final String targetVar, final String descriptor, final String intrFace, final String getterName) {
+    public void start(){
         try{
             jf = new JarFile(theJar);
             entry = new JarEntry(clazz);
-
             Enumeration<JarEntry> en = jf.entries();
 
             cr = new ClassReader(jf.getInputStream(entry));
             cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-            cr.accept(cw, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-
-            AddInterfaceAdapter interfaceAdder = new AddInterfaceAdapter(cw, intrFace);
-            AddGetterAdapter adder = new AddGetterAdapter(interfaceAdder, targetVar, descriptor, getterName, entry.getName());
-            cr.accept(adder, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+            cr.accept(cw, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
         }catch (Exception ex){
             ex.printStackTrace();
         }
     }
 
-    public void addGetter(final String targetVar, final String descriptor, final String getterName) {
+    public void addGetter(final String targetVar, final String descriptor, final String intrFace, final String getterName, final int varInsn, final int retInsn) {
         try{
-            jf = new JarFile(theJar);
-            entry = new JarEntry(clazz);
-            cr = new ClassReader(jf.getInputStream(entry));
-            cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-            cr.accept(cw, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-
-            AddGetterAdapter adder = new AddGetterAdapter(cw, targetVar, descriptor, getterName, entry.getName());
-            cr.accept(adder, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+            interfaceAdder = new AddInterfaceAdapter(combinedAdapter == null ? cw : combinedAdapter, intrFace);
+            adder = new AddGetterAdapter(interfaceAdder, targetVar, descriptor, getterName, entry.getName(), varInsn, retInsn);
+            combinedAdapter = adder;
 
         }catch (Exception ex){
             ex.printStackTrace();
         }
     }
+
+    public void addGetter(final String targetVar, final String descriptor, final String getterName, final int varInsn, final int retInsn) {
+        try{
+            AddGetterAdapter adder = new AddGetterAdapter(combinedAdapter == null ? cw : combinedAdapter, targetVar, descriptor, getterName, entry.getName(), varInsn, retInsn);  //adds filter to CW
+            combinedAdapter = adder;
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public void changeSuperClass(final String superClass){
+        try{
+            changer = new ChangeSuperClassAdapter(combinedAdapter == null ? cw : combinedAdapter, superClass);
+            combinedAdapter = changer;
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
     public void finish(){
         try{
+            cr.accept(combinedAdapter == null ? cw : combinedAdapter, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+
             byte[] outStream = cw.toByteArray();
-            File outDir = new File("Inject Tests");
+            File outDir = new File("Inject Tests ASM");  // Change this part to whatever you like. Remember to output the data stream.
             outDir.mkdirs();
             DataOutputStream out = new DataOutputStream(new FileOutputStream(new File(outDir, entry.getName())));
             out.write(outStream);
             out.flush();
             out.close();
+
         }catch (Exception ex){}
     }
 }
