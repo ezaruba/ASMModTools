@@ -4,7 +4,7 @@ package com.dna.asm.samples;
  * A dummy class.
  * @author trDna
  */
-public class DummyClass {
+public class TheProgram {
 
     public static String theSecretString = "Hello. My name is Bob.";
 
