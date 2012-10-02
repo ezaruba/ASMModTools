@@ -1,8 +1,9 @@
-package com.dna.asm.adapters;
+package com.dna.asm.core.adapters;
 
 import org.objectweb.asm.*;
 
 /**
+ * Adds a method of a given accessor that returns the given field.
  * @author trDna
  */
 
@@ -22,17 +23,16 @@ public class AddGetterAdapter extends ClassVisitor implements Opcodes {
         super(ASM4, cv);
         this.fieldName = fieldName;
         this.getterName = getterName;
-        this.fieldDescriptor = fieldDescriptor;
         this.targetClazz = targetClazz;
         this.varInsn = varInsn;
         this.retInsn = retInsn;
+        this.fieldDescriptor = fieldDescriptor;
     }
 
     @Override
     public FieldVisitor visitField(int access, java.lang.String name, java.lang.String desc, java.lang.String signature, java.lang.Object value){
         if(name.equals(fieldName) && desc.equals(fieldDescriptor)){
             isFieldPresent = true;
-            fieldDescriptor = desc;
             this.signature = signature;
         }
 

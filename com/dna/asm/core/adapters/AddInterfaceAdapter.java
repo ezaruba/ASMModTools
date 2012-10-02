@@ -1,4 +1,4 @@
-package com.dna.asm.adapters;
+package com.dna.asm.core.adapters;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
@@ -6,6 +6,7 @@ import org.objectweb.asm.Opcodes;
 import java.util.ArrayList;
 
 /**
+ * Adds an interface to a given class via a ClassVisitor (ClassWriter).
  * @author trDna
  */
 

@@ -1,9 +1,10 @@
-package com.dna.asm.adapters;
+package com.dna.asm.core.adapters;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
+ * Changes the superclass of the given class via the ClassVisitor (ClassWriter).
  * @author trDna
  */
 

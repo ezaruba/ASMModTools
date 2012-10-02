@@ -1,8 +1,9 @@
-package com.dna.asm.generic;
+package com.dna.asm.core.generic;
 
-import com.dna.asm.adapters.AddGetterAdapter;
-import com.dna.asm.adapters.AddInterfaceAdapter;
-import com.dna.asm.adapters.ChangeSuperClassAdapter;
+import com.dna.asm.core.adapters.AddGetterAdapter;
+import com.dna.asm.core.adapters.AddInterfaceAdapter;
+import com.dna.asm.core.adapters.ChangeSuperClassAdapter;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -17,10 +18,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * A set of manipulation utilities. All transforms must begin with <tt>public void setClass(final String Clazz)</tt>.
+ * A set of manipulation utilities. See MainTransform.java on how to use.
  * All methods that have a String parameter must be expressed in type descriptor form.
+ *
+ * Uses the Core API.
+ *
  * @author trDna
  */
+
 public abstract class AbstractClassTransform implements Opcodes{
 
     private static String clazz;

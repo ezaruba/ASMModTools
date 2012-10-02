@@ -1,12 +1,14 @@
-package com.dna.asm.transforms;
+package com.dna.asm.core.transformers;
 
-import com.dna.asm.generic.AbstractClassTransform;
+import com.dna.asm.core.generic.AbstractClassTransform;
 import org.objectweb.asm.Type;
 
 /**
- * @author trDna
+ * Created with IntelliJ IDEA.
+ * User: trDna
+ * Date: 9/29/12
+ * Time: 4:58 PM
  */
-
 public class MainTransform extends AbstractClassTransform {
 
 
