@@ -42,8 +42,6 @@ public abstract class AbstractClassTransform implements Opcodes{
 
     private ClassVisitor combinedAdapter = null; //Mixture of all adapters
 
-    private LinkedList <ClassVisitor> adapterList = new LinkedList<ClassVisitor>();
-
     public abstract void runTransform();
 
     public void setup(final String theJar, final String clazz){
